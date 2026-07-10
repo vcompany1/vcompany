@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tu Nombre — Currículum</title>
+<meta name="description" content="Currículum de Tu Nombre — Rol profesional">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        #1c1b1a;
+    --surface:   #24221f;
+    --line:      #38352f;
+    --text:      #ece8e1;
+    --muted:     #a39c8f;
+    --accent:    #d8a648;   /* dorado — estado "activo" */
+    --accent-2:  #6fa890;   /* verde-teal — enlaces / tags */
+    --radius:    3px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:var(--accent-2); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  /* ---------- layout: sidebar tipo "árbol de archivos" + contenido ---------- */
+  .wrap{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    min-height:100vh;
+    max-width:1180px;
+    margin:0 auto;
+  }
+
+  aside{
+    border-right:1px solid var(--line);
+    padding:48px 28px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+  }
+
+  .avatar{
+    width:64px; height:64px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2));
+    margin-bottom:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif;
+    font-size:24px; font-weight:700;
+    color:var(--bg);
+  }
+
+  aside h1{
+    font-family:'Fraunces', serif;
+    font-size:1.35rem;
+    font-weight:600;
+    margin-bottom:4px;
+  }
+
+  aside .role{
+    color:var(--muted);
+    font-size:0.9rem;
+    margin-bottom:24px;
+  }
+
+  nav ul{ list-style:none; }
+  nav li{ margin-bottom:2px; }
+  nav a{
+    display:block;
+    color:var(--muted);
+    font-size:0.85rem;
+    padding:7px 10px;
+    border-radius:var(--radius);
+    transition:background .15s ease, color .15s ease;
+  }
+  nav a:hover{
+    background:var(--surface);
+    color:var(--text);
+    text-decoration:none;
+  }
+  nav a::before{
+    content:"› ";
+    color:var(--accent);
+  }
+
+  .sidebar-contact{
+    margin-top:32px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    font-size:0.85rem;
+  }
+
+  main{ padding:48px 40px 96px; }
+
+  section{
+    max-width:720px;
+    margin-bottom:64px;
+    scroll-margin-top:32px;
+  }
+
+  .path-label{
+    font-size:0.78rem;
+    color:var(--accent);
+    margin-bottom:10px;
+    letter-spacing:0.02em;
+  }
+
+  section h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.6rem;
+    margin-bottom:18px;
+    color:var(--text);
+  }
+
+  section p{ color:var(--muted); max-width:60ch; }
+
+  /* ---------- hero ---------- */
+  .hero{ margin-bottom:72px; }
+  .hero .path-label{ margin-bottom:14px; }
+  .hero h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(2.2rem, 5vw, 3.4rem);
+    line-height:1.08;
+    margin-bottom:18px;
+  }
+  .hero .tagline{
+    font-size:1.1rem;
+    color:var(--muted);
+    max-width:56ch;
+    margin-bottom:28px;
+  }
+  .hero .cta-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .btn{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.85rem;
+    padding:11px 20px;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    color:var(--text);
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .btn:hover{ border-color:var(--accent); background:var(--surface); text-decoration:none; }
+  .btn.primary{ background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+  .btn.primary:hover{ opacity:0.9; background:var(--accent); }
+
+  /* ---------- experiencia: estilo "commit log" ---------- */
+  .log-entry{
+    border-left:2px solid var(--line);
+    padding:2px 0 26px 24px;
+    position:relative;
+  }
+  .log-entry::before{
+    content:"";
+    position:absolute;
+    left:-7px; top:4px;
+    width:12px; height:12px;
+    border-radius:50%;
+    background:var(--bg);
+    border:2px solid var(--accent);
+  }
+  .log-entry:last-child{ padding-bottom:0; }
+  .log-meta{
+    font-size:0.78rem;
+    color:var(--accent-2);
+    margin-bottom:4px;
+  }
+  .log-entry h3{
+    font-size:1.05rem;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .log-entry p{ font-size:0.94rem; }
+
+  /* ---------- skills: tags ---------- */
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    padding:6px 12px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    color:var(--accent-2);
+  }
+
+  .skill-group{ margin-bottom:22px; }
+  .skill-group .group-label{
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-bottom:8px;
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  /* ---------- proyectos ---------- */
+  .project-grid{ display:grid; gap:20px; }
+  .project-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px 22px;
+  }
+  .project-card h3{ font-size:1rem; margin-bottom:6px; }
+  .project-card p{ font-size:0.9rem; margin-bottom:10px; }
+  .project-card a{ font-size:0.82rem; font-family:'JetBrains Mono', monospace; }
+
+  footer{
+    max-width:720px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:0.82rem;
+    color:var(--muted);
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px){
+    .wrap{ grid-template-columns:1fr; }
+    aside{
+      position:relative;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--line);
+      padding:32px 24px;
+    }
+    main{ padding:40px 24px 72px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ============ SIDEBAR / NAV ============ -->
+  <aside>
+    <div class="avatar">TN</div>
+    <h1>Tu Nombre</h1>
+    <div class="role">Título profesional · Ciudad</div>
+
+    <nav aria-label="Navegación principal">
+      <ul>
+        <li><a href="#about">about.md</a></li>
+        <li><a href="#experience">experience.log</a></li>
+        <li><a href="#skills">skills.json</a></li>
+        <li><a href="#projects">projects/</a></li>
+        <li><a href="#contact">contact.txt</a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-contact">
+      <a href="mailto:tu@email.com">tu@email.com</a>
+      <a href="https://github.com/tu-usuario" target="_blank" rel="noopener">github.com/tu-usuario</a>
+      <a href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener">linkedin.com/in/tu-usuario</a>
+    </div>
+  </aside>
+
+  <!-- ============ CONTENIDO ============ -->
+  <main>
+
+    <section class="hero" id="top">
+      <div class="path-label mono">~/tu-nombre</div>
+      <h1>Hola, soy Tu Nombre.</h1>
+      <p class="tagline">
+        Breve descripción de una o dos líneas sobre lo que hacés y qué te
+        distingue. Ej: "Desarrollador backend enfocado en sistemas
+        distribuidos y APIs de alto rendimiento."
+      </p>
+      <div class="cta-row">
+        <a class="btn primary" href="#contact">Contactarme</a>
+        <a class="btn" href="/cv-tu-nombre.pdf" target="_blank">Descargar CV (PDF)</a>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="path-label mono">~/about.md</div>
+      <h2>Sobre mí</h2>
+      <p>
+        Escribí acá 3–4 líneas con tu trayectoria: años de experiencia,
+        áreas de interés, y qué tipo de proyectos o roles estás buscando.
+        Mantenelo concreto y en primera persona.
+      </p>
+    </section>
+
+    <section id="experience">
+      <div class="path-label mono">~/experience.log</div>
+      <h2>Experiencia</h2>
+
+      <div class="log-entry">
+        <div class="log-meta mono">2023 — presente</div>
+        <h3>Cargo · Empresa</h3>
+        <p>Descripción breve de tus responsabilidades y un logro medible (ej: "reduje el tiempo de build en 40%").</p>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-meta mono">2021 — 2023</div>
+        <h3>Cargo · Empresa</h3>
+        <p>Descripción breve de tus responsabilidades y un logro medible.</p>
+      </div>
+
+      <div class="log-entry">
+        <div class="log-meta mono">2019 — 2021</div>
+        <h3>Cargo · Empresa</h3>
+        <p>Descripción breve de tus responsabilidades y un logro medible.</p>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="path-label mono">~/skills.json</div>
+      <h2>Habilidades</h2>
+
+      <div class="skill-group">
+        <div class="group-label">lenguajes</div>
+        <div class="tags">
+          <span class="tag">JavaScript</span>
+          <span class="tag">Python</span>
+          <span class="tag">SQL</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <div class="group-label">herramientas</div>
+        <div class="tags">
+          <span class="tag">Git</span>
+          <span class="tag">Docker</span>
+          <span class="tag">AWS</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <div class="group-label">otros</div>
+        <div class="tags">
+          <span class="tag">Inglés — avanzado</span>
+          <span class="tag">Metodologías ágiles</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="path-label mono">~/projects/</div>
+      <h2>Proyectos</h2>
+
+      <div class="project-grid">
+        <div class="project-card">
+          <h3>Nombre del proyecto</h3>
+          <p>Qué hace el proyecto y qué tecnologías usaste, en una o dos líneas.</p>
+          <a href="https://github.com/tu-usuario/proyecto" target="_blank" rel="noopener">ver repositorio →</a>
+        </div>
+
+        <div class="project-card">
+          <h3>Nombre del proyecto</h3>
+          <p>Qué hace el proyecto y qué tecnologías usaste, en una o dos líneas.</p>
+          <a href="https://github.com/tu-usuario/proyecto" target="_blank" rel="noopener">ver repositorio →</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="path-label mono">~/contact.txt</div>
+      <h2>Contacto</h2>
+      <p>¿Hablamos? Escribime por cualquiera de estos medios.</p>
+      <div class="cta-row" style="margin-top:16px;">
+        <a class="btn primary" href="mailto:tu@email.com">tu@email.com</a>
+        <a class="btn" href="https://linkedin.com/in/tu-usuario" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn" href="https://github.com/tu-usuario" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Tu Nombre. Hecho con HTML y CSS, alojado en GitHub Pages.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>
