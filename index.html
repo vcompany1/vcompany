@@ -113,9 +113,15 @@
   }
   .mobilepanel.open{display:flex;}
 
-  @media (max-width: 860px){
+  @media (max-width: 1010px){
     nav.links{display:none;}
     .burger{display:flex;}
+  }
+  @media (max-width: 480px){
+    .wrap{padding:0 18px;}
+    .navright{gap:10px;}
+    .langsw button{padding:7px 8px;}
+    .logo .logotext{display:none;}
   }
 
   /* ---------- BUTTONS / CTA ---------- */
@@ -164,7 +170,7 @@
     position:absolute; bottom:-14px; left:-14px; background:var(--ink); color:#fff;
     font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; padding:8px 12px;
   }
-  @media (max-width:860px){.photo-frame{justify-self:start; max-width:220px; margin-top:24px;}}
+  @media (max-width:860px){.photo-frame{display:none;}}
 
   /* status ticker (signature element) */
   .ticker{
@@ -311,7 +317,7 @@
 
 <header>
   <div class="wrap navbar">
-    <a href="#top" class="logo">[<span>VC</span>] VÍCTOR&nbsp;COMPANY</a>
+    <a href="#top" class="logo">[<span>VC</span>]<span class="logotext">&nbsp;VÍCTOR&nbsp;COMPANY</span></a>
     <nav class="links" id="navLinks"></nav>
     <div class="navright">
       <div class="langsw" id="langsw">
