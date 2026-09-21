@@ -884,13 +884,35 @@ function drawCV(jsPDFCtor, d, photo){
     const step = lh(fs, k);
     doc.splitTextToSize(text, w).forEach(l => { ensure(step); doc.text(l, x, y); y += step; });
   }
-  function bullet(text, x, w, fs, color){
+  function bullet(item, x, w, fs, color){
+    const text = typeof item === 'string' ? item : item.text, link = typeof item === 'string' ? null : item.link;
     font('normal', fs);
     const step = lh(fs, 1.4), arr = doc.splitTextToSize(text, w - 4.2);
     ensure(step);
     fill(C.green); doc.circle(x + 0.7, y - fs*0.3528*0.32, 0.55, 'F');
     ink(color);
-    arr.forEach((l,i) => { if(i) ensure(step); doc.text(l, x + 3.4, y); y += step; });
+    const marker = link ? '\u00A0\u00A0' + link.word : null, ICON = 3.1;
+    arr.forEach((l,i) => {
+      if(i) ensure(step);
+      const at = marker ? l.indexOf(marker) : -1;
+      if (at < 0){ doc.text(l, x + 3.4, y); }
+      else {
+        // line with an inline icon + clickable link word
+        const pre = l.slice(0, at), post = l.slice(at + marker.length);
+        font('normal', fs); ink(color);
+        doc.text(pre, x + 3.4, y);
+        const ix = x + 3.4 + doc.getTextWidth(pre);
+        if (link.icon){ try { doc.addImage(link.icon, 'PNG', ix, y - ICON + 0.5, ICON, ICON); } catch(e){} }
+        const wx = ix + 3.6;
+        font('bold', fs); ink(C.greenDark);
+        doc.textWithLink(link.word, wx, y, {url: link.url});
+        const bw = doc.getTextWidth(link.word);
+        doc.setLineWidth(0.3); doc.setDrawColor(C.green[0],C.green[1],C.green[2]); doc.line(wx, y + 0.7, wx + bw, y + 0.7);
+        font('normal', fs); ink(color);
+        doc.text(post, wx + bw, y);
+      }
+      y += step;
+    });
   }
   function heading(txt){
     ensure(16); y += 5;
@@ -977,16 +999,18 @@ function drawCV(jsPDFCtor, d, photo){
   y += 1;
 
   /* ---- projects ---- */
-  heading(d.headings.proj);
+  heading(d.headings.proj); y += 2;
   d.projects.forEach(p => {
-    ensure(16);
-    font('bold', 10); ink(C.dark); doc.text(p.name, ML, y);
+    ensure(20);
+    const IS = 6.2, tx = ML + (p.icon ? IS + 2.6 : 0);
+    if (p.icon){ try { doc.addImage(p.icon, 'PNG', ML, y - 4.6, IS, IS); } catch(e){} }
+    font('bold', 10.4); ink(C.dark); doc.textWithLink(p.name, tx, y, {url: p.url});
     const nw = doc.getTextWidth(p.name);
-    font('normal', 8.2); ink(C.greenDark); doc.text(p.label.toUpperCase(), ML + nw + 3, y);
-    y += 4.4;
-    lines(p.desc, ML, CW, 9, 'normal', C.ink, 1.45);
+    font('normal', 8.2); ink(C.greenDark); doc.text(p.label.toUpperCase(), tx + nw + 3, y);
+    y += 4.6;
+    lines(p.desc, tx, CW - (tx - ML), 9, 'normal', C.ink, 1.45);
     font('normal', 8.4); ink(C.greenDark);
-    doc.textWithLink(p.urlText, ML, y, {url:p.url}); y += 6;
+    doc.textWithLink(p.urlText, tx, y, {url:p.url}); y += 6.5;
   });
 
   /* ---- footer on every page ---- */
@@ -1002,6 +1026,14 @@ function drawCV(jsPDFCtor, d, photo){
   return doc;
 }
 /* CVGEN-END */
+
+/* helpers: reuse the page's own icons and links inside the PDF */
+const iconSrc = html => { const m = /src="([^"]+)"/.exec(html); return m ? m[1] : null; };
+function pdfBullet(b){
+  if (b.indexOf('fb-link') < 0) return b.replace(/<[^>]*>/g,'');
+  const text = b.replace(/<a class="fb-link"[\s\S]*?<\/a>/, '\u00A0\u00A0FlowBase').replace(/<[^>]*>/g,'');
+  return {text, link:{word:'FlowBase', url:FB_URL, icon:iconSrc(FB_ICON)}};
+}
 
 /* Collects everything from the data that already drives the page (T + contact rows in the DOM). */
 function collectCVData(){
@@ -1027,13 +1059,13 @@ function collectCVData(){
     contacts,
     headings: {about:t.nav[0][1], exp:t.nav[1][1], skills:t.nav[2][1], edu:t.nav[3][1], proj:t.nav[4][1]},
     about: t.about.body,
-    exp: t.exp.items.map(i=>({...i, bullets:i.bullets.map(b=>b.replace(/<[^>]*>/g,'')), achvLabel:t.exp.achvLabel})),
+    exp: t.exp.items.map(i=>({...i, bullets:i.bullets.map(pdfBullet), achvLabel:t.exp.achvLabel})),
     skills: [t.skills.technical, t.skills.digital, t.skills.soft],
     edu: t.education,
     projects: [
-      {name:'FlowBase', label:t.projects.p3.label, desc:t.projects.p3.desc, url:FB_URL, urlText:FB_URL.replace(/^https?:\/\//,'').replace(/\/$/,'')},
-      {name:'Española', label:t.projects.p1.label, desc:t.projects.p1.desc, url:'https://espanola.ch', urlText:'espanola.ch'},
-      {name:'Company Valencia', label:t.projects.p2.label, desc:t.projects.p2.desc, url:'https://paellabasel.ch', urlText:'paellabasel.ch'}
+      {name:'FlowBase', icon:iconSrc(FB_ICON), label:t.projects.p3.label, desc:t.projects.p3.desc, url:FB_URL, urlText:FB_URL.replace(/^https?:\/\//,'').replace(/\/$/,'')},
+      {name:'Española', icon:iconSrc(ESP_ICON), label:t.projects.p1.label, desc:t.projects.p1.desc, url:'https://espanola.ch', urlText:'espanola.ch'},
+      {name:'Company Valencia', icon:iconSrc(CV_ICON), label:t.projects.p2.label, desc:t.projects.p2.desc, url:'https://paellabasel.ch', urlText:'paellabasel.ch'}
     ]
   };
 }
