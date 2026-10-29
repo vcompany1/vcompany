@@ -187,7 +187,12 @@
     position:absolute; bottom:0; left:0; background:var(--accent); color:var(--on-accent);
     font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; padding:8px 12px;
   }
-  @media (max-width:860px){.photo-frame{display:none;}}
+  @media (max-width:860px){
+    .photo-frame{order:-1; justify-self:start; max-width:200px; margin-bottom:-24px;}
+  }
+  @media (max-width:480px){
+    .photo-frame{max-width:160px;}
+  }
 
   /* status ticker (signature element) */
   .ticker{
